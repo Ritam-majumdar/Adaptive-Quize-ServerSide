@@ -12,8 +12,8 @@ namespace QuizServer
       //public  Dictionary<int, Dictionary<string, List<string>>> dict = new Dictionary<int, Dictionary<string, List<string>>>();
         public static int count = 0;
         List<Question> Questions = new List<Question>()
-        {new Question()
         {
+            new Question() {
             Quesid = 1,
             QuestionText = "Who is the CM of WestBengal?",
             Options = new List<Option>
@@ -57,44 +57,60 @@ namespace QuizServer
                         Opid = 4,
                         OptionText ="RaGa"}
                 }
-        }
+            },
+            new Question()
+        {
+            Quesid = 3,
+            QuestionText = "Who is the CM of Kerala?",
+            Options = new List<Option>
+                {
+                    new Option{
+                        Opid = 1,
+                        OptionText ="Siddu"},
+
+                    new Option{
+                        Opid = 2,
+                        OptionText ="Didi"},
+
+                    new Option{
+                        Opid = 3,
+                        OptionText ="Modi"},
+
+                    new Option{
+                        Opid = 4,
+                        OptionText ="RaGa"}
+                }
+            }
         };
 
+        // public Task StoreResponse()
+        // {
 
-        public Task Send(string question)
+        // }
+
+        // Emit's Next Question from the collection of Questions
+        public Task GetNextQuestion()
         {
-            //Console.WriteLine("DATSTSADFSTWSWSDWDDT", question);
-            Console.WriteLine("post" + question);
-            return Clients.All.SendAsync("send", question);
+            if (count < Questions.Count) 
+            {
+                Question question = Questions[count];
+                count++;
+                string q = question.QuestionText;
+                return Clients.Caller.SendAsync("NextQuestion", q);
+            }
+            else
+                return Clients.Caller.SendAsync("EndOfQuestions");
         }
 
-/*         public Task Recieve()
-        {
-            return Clients.All.SendAsync("send", "this is from the server");
-        } */
 
-/*         public override Task OnConnectedAsync()
+        public override Task OnConnectedAsync()
         {
-            Console.WriteLine("Client Connected");
-            Clients.Caller.SendAsync("Hello", "String to be sent");
-            return base.OnConnectedAsync();
-        } */
 
-           public override Task OnConnectedAsync()
-        {
-/*             foreach (KeyValuePair<string, List<string>> item in dict)
-            {
             Console.WriteLine("Client Connected");
-            return Clients.Caller.SendAsync("Hello","from the server" );
-            Console.WriteLine("Key: {0}, Value: {1}",
-            item.Key, item.Value);
-             } */
-            Console.WriteLine("Client Connected");
-            count++;
-            var question = Questions[count];
-            
-            return Clients.Caller.SendAsync("Hello", Questions);
-            //return base.OnConnectedAsync();
+            Console.WriteLine("count before is " + count);
+           
+            Console.WriteLine("count is " + count);
+            return GetNextQuestion();
         }
         
     }
